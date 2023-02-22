@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -16,7 +17,7 @@ class MenuItem(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True, blank=True)
 
     def get_absolute_url(self):
-        return reverse()
+        return reverse('menu-item', kwargs={'menu_name': self.menu.name, 'id': self.id})
 
     def __str__(self):
         parent = f' - child of {self.parent.name}' if self.parent else ''
