@@ -1,0 +1,15 @@
+<ul>
+    {%for menu in menu_items %}
+        <li> {{menu.name}}
+        {%if node.children %}
+            <ul>
+             {%for child in menu.children %}
+                  {%with menu=child template_name="menu.html" %}
+                       {%include template_name%}
+                  {%endwith%}
+             {%endfor%}
+             </ul>
+        {%endif%}
+        </li>
+    {%endfor%}
+</ul>
