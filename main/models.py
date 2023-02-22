@@ -13,7 +13,12 @@ class Menu(models.Model):
 class MenuItem(models.Model):
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse()
 
     def __str__(self):
-        return f'{self.menu.name} - {self.name} - child of {self.parent.name}'
+        parent = f' - child of {self.parent.name}' if self.parent else ''
+        return f'{self.menu.name} - {self.name}' + parent
+
