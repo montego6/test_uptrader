@@ -6,6 +6,8 @@
     <title>Title</title>
 </head>
 <body>
-{% draw_menu 'electronics' %}
+{% for menu in all_menus %}
+    {% draw_menu menu.name %}
+{% endfor %}
 </body>
 </html>

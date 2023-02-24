@@ -1,7 +1,7 @@
 {% load draw_menu %}
 <ul>
     {%for menu in menu_items %}
-    <li> <a href="{{ menu.get_absolute_url }}">{{menu.name|indent:menu.level}}</a>
+    <li><a href="{{ menu.get_absolute_url }}"><pre>{{menu.name|indent:menu.level}}</pre></a>
     </li>
     {%endfor%}
 </ul>
