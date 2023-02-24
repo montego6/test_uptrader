@@ -1,11 +1,7 @@
+{% load draw_menu %}
 <ul>
     {%for menu in menu_items %}
-    <li> <a href="{{ menu.get_absolute_url }}">{{menu.name}}</a>
-        {%if menu.children.all|length %}
-            {% if parent_ids|length == 0 or menu.id in parent_ids %}
-                {% include "menu.html" with menu_items=menu.children.all %}
-            {% endif %}
-        {%endif%}
-        </li>
+    <li> <a href="{{ menu.get_absolute_url }}">{{menu.name|indent:menu.level}}</a>
+    </li>
     {%endfor%}
 </ul>

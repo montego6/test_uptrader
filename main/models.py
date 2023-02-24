@@ -32,7 +32,11 @@ class MenuItem(models.Model):
         MenuItem.objects.bulk_update(node_list, ['left', 'right'])
 
     def get_absolute_url(self):
-        return reverse('menu-item', kwargs={'menu_name': self.menu.name, 'id': self.id})
+        return reverse('menu-item', kwargs={'menu_name': self.menu.name,
+                                            'level': self.level,
+                                            'left': self.left,
+                                            'right': self.right,
+                                            })
 
     def __str__(self):
         parent = f' - child of {self.parent.name}' if self.parent else ''

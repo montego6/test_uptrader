@@ -1,19 +1,23 @@
 from django import template
+from django.db.models import Q
 from ..models import Menu, MenuItem
 
 register = template.Library()
 
 
+@register.filter(name='indent')
+def indent_string(value, num_tabs=1):
+    return ' '*4*num_tabs + value
+
+
 @register.inclusion_tag('menu.html')
 def draw_menu(menu_name, *args):
     menu = Menu.objects.get(name=menu_name)
-    menu_items = MenuItem.objects.prefetch_related('children').filter(menu=menu, parent=None).order_by('id')
-    ids = []
+    menu_items = MenuItem.objects.filter(menu=menu, level__lte=1).order_by('id')
     if args:
-        menu_item = MenuItem.objects.get(id=args[0])
-        ids.append(menu_item.id)
-        parent = menu_item.parent
-        while parent:
-            ids.append(parent.id)
-            parent = parent.parent
-    return {'menu_items': menu_items, 'parent_ids': ids}
+        level, left, right = [*args]
+        menu_items = MenuItem.objects.filter(Q(left__lte=left, right__gte=right) |
+                                             Q(left__gt=left, right__gt=right) |
+                                             Q(left__gt=left, level=level+1)
+                                             )
+    return {'menu_items': menu_items}
