@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from funcs import mptt
+from .funcs import mptt
 # Create your models here.
 
 
@@ -8,7 +8,7 @@ class Menu(models.Model):
     name = models.CharField(max_length=100)
 
     def save(self, *args, **kwargs):
-        super().save(self, *args, **kwargs)
+        super().save(*args, **kwargs)
         MenuItem.objects.create(menu=self, name=self.name, level=0)
 
     def __str__(self):
@@ -25,10 +25,11 @@ class MenuItem(models.Model):
 
     def save(self, *args, **kwargs):
         self.level = self.parent.level + 1 if self.parent else 0
-        super().save(self, *args, **kwargs)
+        super().save(*args, **kwargs)
         main_node = MenuItem.objects.get(level=0)
-        mptt(main_node, counter=0)
-        MenuItem.objects.bulk_update(MenuItem.objects.all(), ['left', 'right'])
+        node_list = []
+        mptt(main_node, 0, node_list)
+        MenuItem.objects.bulk_update(node_list, ['left', 'right'])
 
     def get_absolute_url(self):
         return reverse('menu-item', kwargs={'menu_name': self.menu.name, 'id': self.id})
