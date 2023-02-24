@@ -28,7 +28,7 @@ class MenuItem(models.Model):
     def save(self, *args, **kwargs):
         self.level = self.parent.level + 1 if self.parent else 0
         super().save(*args, **kwargs)
-        main_node = MenuItem.objects.get(level=0)
+        main_node = MenuItem.objects.get(menu__name=self.menu.name, level=0)
         node_list = []
         mptt(main_node, 0, node_list)
         MenuItem.objects.bulk_update(node_list, ['left', 'right', 'parent_left', 'parent_right'])

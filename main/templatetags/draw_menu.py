@@ -16,6 +16,7 @@ def draw_menu(menu_name, *args):
     if args:
         level, left, right, parent_left, parent_right = [*args]
         menu_items = MenuItem.objects.select_related('menu')\
+                                             .filter(menu__name=menu_name)\
                                              .filter(Q(left__lte=left, right__gte=right) |
                                              Q(left__gt=parent_left, right__lt=parent_right, level=level) |
                                              Q(left__gt=left, right__lt=right, level=level+1) |
