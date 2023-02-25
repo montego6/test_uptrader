@@ -5,7 +5,7 @@ from .models import Menu, MenuItem
 
 class MenuItemAdmin(admin.ModelAdmin):
     list_select_related = ['menu', 'parent']
-    readonly_fields = ['left', 'right', 'level', 'parent_left', 'parent_right']
+    readonly_fields = ['left', 'right', 'level']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":

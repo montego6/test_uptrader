@@ -22,23 +22,19 @@ class MenuItem(models.Model):
     left = models.IntegerField(null=True, blank=True)
     right = models.IntegerField(null=True, blank=True)
     level = models.IntegerField(null=True, blank=True)
-    parent_left = models.IntegerField(null=True, blank=True)
-    parent_right = models.IntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         main_node = MenuItem.objects.get(menu__name=self.menu.name, level=0)
         node_list = []
-        mptt(main_node, 0, node_list, 0, 0, [])
-        MenuItem.objects.bulk_update(node_list, ['left', 'right', 'parent_left', 'parent_right', 'level'])
+        mptt(main_node, 0, node_list, 0)
+        MenuItem.objects.bulk_update(node_list, ['left', 'right', 'level'])
 
     def get_absolute_url(self):
         return reverse('menu-item', kwargs={'menu_name': self.menu.name,
                                             'level': self.level,
                                             'left': self.left,
                                             'right': self.right,
-                                            'parent_left': self.parent_left,
-                                            'parent_right': self.parent_right,
                                             })
 
     def __str__(self):
