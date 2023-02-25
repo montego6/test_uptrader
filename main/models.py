@@ -28,9 +28,12 @@ class MenuItem(models.Model):
     level = models.IntegerField(null=True, blank=True)
 
     def clean(self):
-        if self.menu != self.parent.menu:
+        if self.parent and self.menu != self.parent.menu:
             raise ValidationError({
                 'menu': 'Menu of parent and child should match'})
+        if self.parent == self:
+            raise ValidationError({
+                'parent': 'Menu item can\'t be a parent of self'})
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -54,7 +57,11 @@ def save_or_delete_menu_item(sender, instance, **kwargs):
 
 
 def recalculate_mptt(instance):
-    main_node = MenuItem.objects.get(menu__name=instance.menu.name, level=0)
-    node_list = []
-    mptt(main_node, 0, node_list, 0)
-    MenuItem.objects.bulk_update(node_list, ['left', 'right', 'level'])
+    try:
+        main_node = MenuItem.objects.get(menu__name=instance.menu.name, level=0)
+    except MenuItem.DoesNotExist:
+        pass
+    else:
+        node_list = []
+        mptt(main_node, 0, node_list, 0)
+        MenuItem.objects.bulk_update(node_list, ['left', 'right', 'level'])
