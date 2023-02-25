@@ -9,11 +9,10 @@ class MenuItemAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":
-            kwargs["queryset"] = MenuItem.objects.select_related('parent', 'menu')
+            kwargs["queryset"] = \
+                MenuItem.objects.select_related('parent', 'menu')
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(Menu)
 admin.site.register(MenuItem, MenuItemAdmin)
-
-

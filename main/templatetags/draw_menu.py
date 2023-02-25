@@ -1,6 +1,6 @@
 from django import template
 from django.db.models import Q
-from ..models import Menu, MenuItem
+from ..models import MenuItem
 
 register = template.Library()
 
@@ -15,7 +15,7 @@ def draw_menu(menu_name, *args):
     menu_items = MenuItem.objects.select_related('menu')\
         .filter(menu__name=menu_name, level__lte=1).order_by('left')
     if args:
-        level, left, right = [*args]
+        left, right = [*args]
         menu_items = MenuItem.objects.select_related('menu') \
             .filter(menu__name=menu_name) \
             .filter(Q(parent__left__lte=left, parent__right__gte=right) |
