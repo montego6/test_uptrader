@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from .funcs import mptt
 # Create your models here.
@@ -23,13 +25,6 @@ class MenuItem(models.Model):
     right = models.IntegerField(null=True, blank=True)
     level = models.IntegerField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        main_node = MenuItem.objects.get(menu__name=self.menu.name, level=0)
-        node_list = []
-        mptt(main_node, 0, node_list, 0)
-        MenuItem.objects.bulk_update(node_list, ['left', 'right', 'level'])
-
     def get_absolute_url(self):
         return reverse('menu-item', kwargs={'menu_name': self.menu.name,
                                             'level': self.level,
@@ -41,3 +36,21 @@ class MenuItem(models.Model):
         parent = f' - child of {self.parent.name}' if self.parent else ''
         return f'{self.menu.name} - {self.name}' + parent
 
+
+@receiver(post_delete)
+def delete_menu_item(sender, instance, **kwargs):
+    if sender == MenuItem:
+        recalculate_mptt(instance)
+
+
+@receiver(post_save)
+def save_menu_item(sender, instance, **kwargs):
+    if sender == MenuItem:
+        recalculate_mptt(instance)
+
+
+def recalculate_mptt(instance):
+    main_node = MenuItem.objects.get(menu__name=instance.menu.name, level=0)
+    node_list = []
+    mptt(main_node, 0, node_list, 0)
+    MenuItem.objects.bulk_update(node_list, ['left', 'right', 'level'])

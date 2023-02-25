@@ -12,7 +12,8 @@ def indent_string(value, num_tabs=1):
 
 @register.inclusion_tag('menu.html')
 def draw_menu(menu_name, *args):
-    menu_items = MenuItem.objects.filter(menu__name=menu_name, level__lte=1).order_by('left')
+    menu_items = MenuItem.objects.select_related('menu')\
+        .filter(menu__name=menu_name, level__lte=1).order_by('left')
     if args:
         level, left, right = [*args]
         menu_items = MenuItem.objects.select_related('menu') \
